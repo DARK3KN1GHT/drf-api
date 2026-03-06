@@ -1,8 +1,6 @@
 from django.urls import path
-from .views import home, agendar, sucesso
+from . import views
 
 urlpatterns = [
-    path('', home, name='home'),
-    path('agendar/', agendar, name='agendar'),
-    path('sucesso/', sucesso, name='sucesso'),
+    path("", views.home, name="home"),  # <- sua página inicial antiga
 ]

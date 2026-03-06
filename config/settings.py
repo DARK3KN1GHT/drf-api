@@ -2,145 +2,67 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# ==============================
-# SEGURANÇA
-# ==============================
-
-SECRET_KEY = 'django-insecure-change-this-key'
-
+SECRET_KEY = "sua-chave"
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
-
-# ==============================
-# APPS INSTALADAS
-# ==============================
-
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 
-    # terceiros
-    'rest_framework',
-    'drf_spectacular',
-    'siteweb',
-
-    # apps do projeto
-    'agenda',
+    "agenda",
+    "siteweb",
 ]
-
-
-# ==============================
-# MIDDLEWARE
-# ==============================
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
-ROOT_URLCONF = 'config.urls'
-
-
-# ==============================
-# TEMPLATES
-# ==============================
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],   # <-- IMPORTANTE
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-
-WSGI_APPLICATION = 'config.wsgi.application'
-
-
-# ==============================
-# BANCO DE DADOS
-# ==============================
+WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
-
-# ==============================
-# VALIDAÇÃO DE SENHA
-# ==============================
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-]
-
-
-# ==============================
-# INTERNACIONALIZAÇÃO
-# ==============================
-
-LANGUAGE_CODE = 'pt-br'
-
-TIME_ZONE = 'America/Sao_Paulo'
-
+LANGUAGE_CODE = "pt-br"
+TIME_ZONE = "America/Sao_Paulo"
 USE_I18N = True
-
 USE_TZ = True
 
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+    ]  # <-- IMPORTANTE
 
-# ==============================
-# ARQUIVOS ESTÁTICOS
-# ==============================
-
-STATIC_URL = 'static/'
-
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-# ==============================
-# DJANGO REST FRAMEWORK
-# ==============================
-
-REST_FRAMEWORK = {
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-}
-
-
-# ==============================
-# SWAGGER / DOCUMENTAÇÃO
-# ==============================
-
-SPECTACULAR_SETTINGS = {
-    "TITLE": "Agenda API",
-    "DESCRIPTION": "API para gestão de agendamentos e horários.",
-    "VERSION": "1.0.0",
-}
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

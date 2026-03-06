@@ -3,3 +3,7 @@ __pychache__/
 *.pyc
 db.sqlite3
 .vscode/
+.env
+staticfiles/
+node_modules/
+.DS_Store
