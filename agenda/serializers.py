@@ -5,7 +5,7 @@ from .models import Horario, Agendamento
 class HorarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Horario
-        fields = ["id", "hora"]
+        fields = ["id", "empresa", "horario"]
 
 
 class AgendamentoSerializer(serializers.ModelSerializer):
@@ -13,7 +13,20 @@ class AgendamentoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Agendamento
-        fields = ["id", "nome", "data", "horario", "horario_display", "criado_em"]
+        fields = [
+            "id",
+            "empresa",
+            "nome",
+            "telefone",
+            "data",
+            "horario",
+            "horario_display",
+            "observacoes",
+            "criado_em",
+        ]
+        read_only_fields = ["criado_em", "horario_display"]
 
     def get_horario_display(self, obj):
-        return obj.horario.hora.strftime("%H:%M")
+        if obj.horario and obj.horario.horario:
+            return str(obj.horario.horario)[:5]
+        return None
