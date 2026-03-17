@@ -5,15 +5,17 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 
 from rest_framework import generics, viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .forms import AgendamentoForm
 from .models import Horario, Agendamento
 from .serializers import HorarioSerializer, AgendamentoSerializer
-from .permissions import IsAdminForDeleteOtherwiseAuthenticatedOrReadOnly
 
 
+# =========================================================
+# 🔹 HTML (páginas normais continuam abertas)
+# =========================================================
 def home(request):
     return render(request, "home.html")
 
@@ -29,11 +31,11 @@ def agendar(request):
             try:
                 obj.data = datetime.strptime(data_str, "%d/%m/%Y").date()
             except ValueError:
-                form.add_error("data", "Data inválida. Selecione pelo calendário.")
+                form.add_error("data", "Data inválida.")
                 return render(request, "agendar.html", {"form": form})
 
             if obj.data < timezone.localdate():
-                form.add_error("data", "Não é permitido agendar em datas passadas.")
+                form.add_error("data", "Não é permitido data passada.")
                 return render(request, "agendar.html", {"form": form})
 
             obj.save()
@@ -50,33 +52,41 @@ def horarios_por_empresa(request):
 
     horarios = []
     for h in qs:
-        if isinstance(h.horario, str):
-            horario_txt = h.horario.strip()[:5]
-        else:
-            horario_txt = h.horario.strftime("%H:%M")
-
-        horarios.append({"id": h.id, "horario": horario_txt})
+        horario_txt = h.horario.strftime("%H:%M")
+        horarios.append({
+            "id": h.id,
+            "horario": horario_txt
+        })
 
     return JsonResponse({"horarios": horarios})
 
 
-# ==========================================
-# API DRF
-# ==========================================
+# =========================================================
+# 🔹 API DRF
+# =========================================================
 
+# 🔓 Horários continuam públicos (opcional)
 class HorarioListAPIView(generics.ListAPIView):
     queryset = Horario.objects.all().order_by("horario")
     serializer_class = HorarioSerializer
     permission_classes = [AllowAny]
 
 
+# 🔒 Agendamentos totalmente protegidos
 class AgendamentoViewSet(viewsets.ModelViewSet):
     queryset = Agendamento.objects.all().order_by("-criado_em")
     serializer_class = AgendamentoSerializer
-    permission_classes = [IsAdminForDeleteOtherwiseAuthenticatedOrReadOnly]
 
+    # 🔐 BLOQUEIA TUDO sem token
+    permission_classes = [IsAuthenticated]
+
+    # 🔎 Filtros
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["empresa", "data", "nome"]
+
+    # 🔍 Busca
     search_fields = ["nome", "telefone", "observacoes"]
+
+    # ↕️ Ordenação
     ordering_fields = ["data", "criado_em", "nome"]
     ordering = ["-criado_em"]

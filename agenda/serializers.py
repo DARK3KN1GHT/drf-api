@@ -26,6 +26,22 @@ class AgendamentoSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["criado_em", "horario_display"]
 
+    def validate(self, data):
+        empresa = data.get("empresa")
+        data_agendamento = data.get("data")
+        horario = data.get("horario")
+
+        if Agendamento.objects.filter(
+            empresa=empresa,
+            data=data_agendamento,
+            horario=horario
+        ).exists():
+            raise serializers.ValidationError(
+                "Este horário já está ocupado para essa empresa."
+            )
+
+        return data
+
     def get_horario_display(self, obj):
         if obj.horario and obj.horario.horario:
             return str(obj.horario.horario)[:5]
