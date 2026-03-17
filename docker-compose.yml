@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:17
+    container_name: drf_api_db
+    restart: always
+    environment:
+      POSTGRES_DB: drf_api
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: rV4@94NZWy3&3W&
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: drf_api_web
+    restart: always
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
