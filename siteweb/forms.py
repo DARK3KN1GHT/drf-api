@@ -1,40 +1,61 @@
 from django import forms
-from django.core.exceptions import ValidationError
-from datetime import date
-
-from agenda.models import Agendamento
+from agenda.models import Agendamento, Empresa, Horario
 
 
 class AgendamentoForm(forms.ModelForm):
+    empresa = forms.ModelChoiceField(
+        queryset=Empresa.objects.all(),
+        empty_label="Selecione uma empresa",
+        widget=forms.Select(attrs={"class": "form-control"})
+    )
+
+    horario = forms.ModelChoiceField(
+        queryset=Horario.objects.none(),
+        empty_label="Selecione um horário",
+        widget=forms.Select(attrs={"class": "form-control"})
+    )
+
+    data = forms.DateField(
+        widget=forms.DateInput(attrs={
+            "class": "form-control",
+            "placeholder": "Selecione uma data",
+            "autocomplete": "off",
+        })
+    )
 
     class Meta:
         model = Agendamento
-        fields = ["nome", "telefone", "data", "horario", "observacoes"]
+        fields = ["empresa", "nome", "telefone", "data", "horario", "observacoes"]
+        widgets = {
+            "nome": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Digite seu nome",
+            }),
+            "telefone": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "(00) 00000-0000",
+            }),
+            "observacoes": forms.Textarea(attrs={
+                "class": "form-control",
+                "placeholder": "Observações (opcional)",
+                "rows": 5,
+            }),
+        }
 
-    def clean(self):
-        cleaned_data = super().clean()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        data = cleaned_data.get("data")
-        horario = cleaned_data.get("horario")
-
-        # 1️⃣ bloquear datas passadas
-        if data and data < date.today():
-            raise ValidationError("Não é possível agendar em datas passadas.")
-
-        # 2️⃣ bloquear sábado e domingo
-        if data and data.weekday() >= 5:
-            raise ValidationError("Atendimento apenas de segunda a sexta.")
-
-        # 3️⃣ limitar a 2 pessoas por horário
-        if data and horario:
-            qtd = Agendamento.objects.filter(
-                data=data,
-                horario=horario
-            ).count()
-
-            if qtd >= 2:
-                raise ValidationError(
-                    "Esse horário já atingiu o limite de 2 agendamentos. Escolha outro."
-                )
-
-        return cleaned_data
+        if "empresa" in self.data:
+            try:
+                empresa_id = int(self.data.get("empresa"))
+                self.fields["horario"].queryset = Horario.objects.filter(
+                    empresa_id=empresa_id
+                ).order_by("horario")
+            except (ValueError, TypeError):
+                self.fields["horario"].queryset = Horario.objects.none()
+        elif self.instance.pk and self.instance.empresa:
+            self.fields["horario"].queryset = Horario.objects.filter(
+                empresa=self.instance.empresa
+            ).order_by("horario")
+        else:
+            self.fields["horario"].queryset = Horario.objects.none()

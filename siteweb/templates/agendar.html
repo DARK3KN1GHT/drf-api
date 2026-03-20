@@ -1,83 +1,185 @@
 {% extends "base.html" %}
-{% load static %}
 
-{% block title %}Agendar{% endblock %}
-
-{% block extra_css %}
-  <!-- Flatpickr (CSS) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-{% endblock %}
+{% block title %}Agendar | Agenda{% endblock %}
 
 {% block content %}
-<div class="card">
-  <div class="card__header">
-    <h1>Agendar</h1>
-    <p class="muted">Escolha a empresa, selecione uma data (hoje ou futura) e depois o horário.</p>
-    <span class="hint">Telefone no formato (00) 00000-0000 • Horário no formato 00:00</span>
-  </div>
+<section class="booking-page">
+    <div class="booking-grid">
+        <div class="booking-left">
+            <span class="section-badge">Novo agendamento</span>
+            <h1 class="booking-title mt-3">Agende com rapidez e visual profissional</h1>
+            <p class="booking-subtitle mt-3">
+                Escolha a empresa, informe seus dados, selecione a data e carregue
+                automaticamente os horários disponíveis.
+            </p>
 
-  {% if form.non_field_errors %}
-    <div class="alert">{{ form.non_field_errors }}</div>
-  {% endif %}
+            <div class="booking-features mt-4">
+                <div class="booking-feature-card">
+                    <h3>Empresa</h3>
+                    <p>Selecione a unidade desejada para carregar os horários corretos.</p>
+                </div>
 
-  <form class="form" method="post" novalidate>
-    {% csrf_token %}
+                <div class="booking-feature-card">
+                    <h3>Data</h3>
+                    <p>Escolha uma data válida usando um calendário visual mais moderno.</p>
+                </div>
 
-    <div class="grid">
-      <div class="field">
-        <label for="{{ form.empresa.id_for_label }}">Empresa</label>
-        {{ form.empresa }}
-        {% if form.empresa.errors %}<span class="error">{{ form.empresa.errors|striptags }}</span>{% endif %}
-      </div>
+                <div class="booking-feature-card">
+                    <h3>Horário</h3>
+                    <p>Os horários são carregados automaticamente conforme a empresa selecionada.</p>
+                </div>
+            </div>
+        </div>
 
-      <div class="field">
-        <label for="{{ form.nome.id_for_label }}">Nome</label>
-        {{ form.nome }}
-        {% if form.nome.errors %}<span class="error">{{ form.nome.errors|striptags }}</span>{% endif %}
-      </div>
+        <div class="booking-right">
+            <div class="form-shell">
+                <div class="form-shell-header">
+                    <h2>Formulário de agendamento</h2>
+                    <p>Preencha os dados abaixo para confirmar seu atendimento.</p>
+                </div>
 
-      <div class="field">
-        <label for="{{ form.telefone.id_for_label }}">Telefone</label>
-        {{ form.telefone }}
-        {% if form.telefone.errors %}<span class="error">{{ form.telefone.errors|striptags }}</span>{% endif %}
-      </div>
+                <div class="form-shell-body">
+                    <form method="post" id="agendamento-form">
+                        {% csrf_token %}
 
-      <div class="field">
-        <label for="{{ form.data.id_for_label }}">Data</label>
-        {{ form.data }}
-        {% if form.data.errors %}<span class="error">{{ form.data.errors|striptags }}</span>{% endif %}
-      </div>
+                        <div class="form-grid">
+                            <div class="form-group full">
+                                <label for="{{ form.empresa.id_for_label }}">Empresa</label>
+                                {{ form.empresa }}
+                            </div>
 
-      <div class="field field--wide">
-        <label for="{{ form.horario.id_for_label }}">Horário</label>
-        {{ form.horario }}
-        <span class="hint">Mostra apenas horários disponíveis (formato 00:00).</span>
-        {% if form.horario.errors %}<span class="error">{{ form.horario.errors|striptags }}</span>{% endif %}
-      </div>
+                            <div class="form-group">
+                                <label for="{{ form.nome.id_for_label }}">Nome</label>
+                                {{ form.nome }}
+                            </div>
 
-      <div class="field field--wide">
-        <label for="{{ form.observacoes.id_for_label }}">Observações</label>
-        {{ form.observacoes }}
-        {% if form.observacoes.errors %}<span class="error">{{ form.observacoes.errors|striptags }}</span>{% endif %}
-      </div>
+                            <div class="form-group">
+                                <label for="{{ form.telefone.id_for_label }}">Telefone</label>
+                                {{ form.telefone }}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.data.id_for_label }}">Data</label>
+                                {{ form.data }}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.horario.id_for_label }}">Horário</label>
+                                {{ form.horario }}
+                            </div>
+
+                            <div class="form-group full">
+                                <label for="{{ form.observacoes.id_for_label }}">Observações</label>
+                                {{ form.observacoes }}
+                            </div>
+                        </div>
+
+                        <div class="form-help-line" id="status-horarios">
+                            Ao escolher a empresa, os horários disponíveis serão carregados automaticamente.
+                        </div>
+
+                        <div class="form-actions mt-4">
+                            <button type="submit" class="btn btn-primary btn-action-primary">
+                                Confirmar agendamento
+                            </button>
+                            <a href="{% url 'home' %}" class="btn btn-outline-light btn-action-outline">
+                                Voltar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="actions">
-      <button class="btn btn--primary" type="submit">Confirmar agendamento</button>
-      <a class="btn btn--ghost" href="{% url 'home' %}">Voltar</a>
-    </div>
-  </form>
-</div>
+</section>
 {% endblock %}
 
-{% block extra_js %}
-  <!-- Flatpickr -->
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const campoTelefone = document.getElementById("id_telefone");
+    const campoEmpresa = document.getElementById("id_empresa");
+    const campoHorario = document.getElementById("id_horario");
+    const campoData = document.getElementById("id_data");
+    const statusHorarios = document.getElementById("status-horarios");
+    const urlHorarios = "{% url 'horarios_por_empresa' %}";
 
-  <!-- IMask (telefone) -->
-  <script src="https://cdn.jsdelivr.net/npm/imask"></script>
+    if (campoData) {
+        flatpickr(campoData, {
+            locale: "pt",
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            allowInput: false
+        });
+    }
 
-  <!-- Seu JS -->
-  <script src="{% static 'js/agendar.js' %}"></script>
+    if (campoTelefone) {
+        campoTelefone.addEventListener("input", function (e) {
+            let valor = e.target.value.replace(/\D/g, "");
+
+            if (valor.length > 11) {
+                valor = valor.slice(0, 11);
+            }
+
+            if (valor.length > 6) {
+                valor = valor.replace(/(\d{2})(\d{5})(\d+)/, "($1) $2-$3");
+            } else if (valor.length > 2) {
+                valor = valor.replace(/(\d{2})(\d+)/, "($1) $2");
+            }
+
+            e.target.value = valor;
+        });
+    }
+
+    function resetHorarios(mensagem) {
+        campoHorario.innerHTML = '<option value="">Selecione um horário</option>';
+        if (mensagem) {
+            statusHorarios.textContent = mensagem;
+        }
+    }
+
+    if (campoEmpresa && campoHorario) {
+        campoEmpresa.addEventListener("change", function () {
+            const empresaId = this.value;
+
+            if (!empresaId) {
+                resetHorarios("Selecione uma empresa para visualizar os horários.");
+                return;
+            }
+
+            campoHorario.innerHTML = '<option value="">Carregando horários...</option>';
+            statusHorarios.textContent = "Buscando horários disponíveis...";
+
+            fetch(`${urlHorarios}?empresa=${empresaId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Resposta inválida do servidor");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    campoHorario.innerHTML = '<option value="">Selecione um horário</option>';
+
+                    if (data.horarios && data.horarios.length > 0) {
+                        data.horarios.forEach(item => {
+                            const option = document.createElement("option");
+                            option.value = item.id;
+                            option.textContent = item.horario;
+                            campoHorario.appendChild(option);
+                        });
+                        statusHorarios.textContent = "Horários carregados com sucesso.";
+                    } else {
+                        campoHorario.innerHTML = '<option value="">Nenhum horário disponível</option>';
+                        statusHorarios.textContent = "Não há horários disponíveis para esta empresa.";
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro ao carregar horários:", error);
+                    campoHorario.innerHTML = '<option value="">Erro ao carregar horários</option>';
+                    statusHorarios.textContent = "Erro ao buscar horários. Verifique a rota e a view.";
+                });
+        });
+    }
+});
+</script>
 {% endblock %}

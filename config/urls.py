@@ -12,20 +12,13 @@ router.register(r"agendamentos", views.AgendamentoViewSet, basename="agendamento
 urlpatterns = [
     path("admin/", admin.site.urls),
 
-    # páginas HTML
-    path("", views.home, name="home"),
-    path("agendar/", views.agendar, name="agendar"),
-    path("api/horarios-por-empresa/", views.horarios_por_empresa, name="horarios_por_empresa"),
+    path("", include("siteweb.urls")),
 
-    # API DRF
-    path("api/horarios/", views.HorarioListAPIView.as_view(), name="api_horarios"),
     path("api/", include(router.urls)),
 
-    # JWT
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 
-    # Documentação
     path("api/schema/", SpectacularAPIView.as_view(), name="api_schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="api_schema"), name="api_docs"),
     path("api/redoc/", SpectacularRedocView.as_view(url_name="api_schema"), name="api_redoc"),
