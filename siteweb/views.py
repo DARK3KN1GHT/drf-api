@@ -23,19 +23,34 @@ def agendar(request):
 
 def horarios_por_empresa(request):
     empresa_id = request.GET.get("empresa")
+    data = request.GET.get("data")
 
     if not empresa_id:
         return JsonResponse({"horarios": []})
 
     empresa = get_object_or_404(Empresa, id=empresa_id)
-    horarios = Horario.objects.filter(empresa=empresa).order_by("horario")
+
+    horarios = Horario.objects.filter(
+        empresa=empresa
+    ).order_by("horario")
+
+    horarios_disponiveis = []
+
+    for horario in horarios:
+        if data:
+            quantidade = horario.agendamentos.filter(
+                empresa=empresa,
+                data=data
+            ).count()
+
+            if quantidade >= 2:
+                continue
+
+        horarios_disponiveis.append({
+            "id": horario.id,
+            "horario": horario.horario
+        })
 
     return JsonResponse({
-        "horarios": [
-            {
-                "id": h.id,
-                "horario": h.horario
-            }
-            for h in horarios
-        ]
+        "horarios": horarios_disponiveis
     })

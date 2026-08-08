@@ -5,181 +5,446 @@
 {% block content %}
 <section class="booking-page">
     <div class="booking-grid">
+
         <div class="booking-left">
             <span class="section-badge">Novo agendamento</span>
-            <h1 class="booking-title mt-3">Agende com rapidez e visual profissional</h1>
+
+            <h1 class="booking-title mt-3">
+                Agende com rapidez e visual profissional
+            </h1>
+
             <p class="booking-subtitle mt-3">
-                Escolha a empresa, informe seus dados, selecione a data e carregue
-                automaticamente os horários disponíveis.
+                Escolha a empresa, informe seus dados, selecione a data
+                e carregue automaticamente os horários disponíveis.
             </p>
 
             <div class="booking-features mt-4">
+
                 <div class="booking-feature-card">
                     <h3>Empresa</h3>
-                    <p>Selecione a unidade desejada para carregar os horários corretos.</p>
+                    <p>
+                        Selecione a unidade desejada para carregar
+                        os horários corretos.
+                    </p>
                 </div>
 
                 <div class="booking-feature-card">
                     <h3>Data</h3>
-                    <p>Escolha uma data válida usando um calendário visual mais moderno.</p>
+                    <p>
+                        Escolha uma data válida usando um calendário
+                        visual moderno.
+                    </p>
                 </div>
 
                 <div class="booking-feature-card">
                     <h3>Horário</h3>
-                    <p>Os horários são carregados automaticamente conforme a empresa selecionada.</p>
+                    <p>
+                        Os horários são atualizados automaticamente
+                        conforme a empresa e a data selecionadas.
+                    </p>
                 </div>
+
             </div>
         </div>
 
         <div class="booking-right">
             <div class="form-shell">
+
                 <div class="form-shell-header">
                     <h2>Formulário de agendamento</h2>
-                    <p>Preencha os dados abaixo para confirmar seu atendimento.</p>
+
+                    <p>
+                        Preencha os dados abaixo para confirmar seu atendimento.
+                    </p>
                 </div>
 
                 <div class="form-shell-body">
+
                     <form method="post" id="agendamento-form">
                         {% csrf_token %}
 
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for erro in form.non_field_errors %}
+                                    <div>{{ erro }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
                         <div class="form-grid">
+
                             <div class="form-group full">
-                                <label for="{{ form.empresa.id_for_label }}">Empresa</label>
+                                <label for="{{ form.empresa.id_for_label }}">
+                                    Empresa
+                                </label>
+
                                 {{ form.empresa }}
+
+                                {% for erro in form.empresa.errors %}
+                                    <div class="text-danger mt-1">
+                                        {{ erro }}
+                                    </div>
+                                {% endfor %}
                             </div>
 
                             <div class="form-group">
-                                <label for="{{ form.nome.id_for_label }}">Nome</label>
+                                <label for="{{ form.nome.id_for_label }}">
+                                    Nome
+                                </label>
+
                                 {{ form.nome }}
+
+                                {% for erro in form.nome.errors %}
+                                    <div class="text-danger mt-1">
+                                        {{ erro }}
+                                    </div>
+                                {% endfor %}
                             </div>
 
                             <div class="form-group">
-                                <label for="{{ form.telefone.id_for_label }}">Telefone</label>
+                                <label for="{{ form.telefone.id_for_label }}">
+                                    Telefone
+                                </label>
+
                                 {{ form.telefone }}
+
+                                {% for erro in form.telefone.errors %}
+                                    <div class="text-danger mt-1">
+                                        {{ erro }}
+                                    </div>
+                                {% endfor %}
                             </div>
 
                             <div class="form-group">
-                                <label for="{{ form.data.id_for_label }}">Data</label>
+                                <label for="{{ form.data.id_for_label }}">
+                                    Data
+                                </label>
+
                                 {{ form.data }}
+
+                                {% for erro in form.data.errors %}
+                                    <div class="text-danger mt-1">
+                                        {{ erro }}
+                                    </div>
+                                {% endfor %}
                             </div>
 
                             <div class="form-group">
-                                <label for="{{ form.horario.id_for_label }}">Horário</label>
+                                <label for="{{ form.horario.id_for_label }}">
+                                    Horário
+                                </label>
+
                                 {{ form.horario }}
+
+                                {% for erro in form.horario.errors %}
+                                    <div class="text-danger mt-1">
+                                        {{ erro }}
+                                    </div>
+                                {% endfor %}
                             </div>
 
                             <div class="form-group full">
-                                <label for="{{ form.observacoes.id_for_label }}">Observações</label>
+                                <label for="{{ form.observacoes.id_for_label }}">
+                                    Observações
+                                </label>
+
                                 {{ form.observacoes }}
+
+                                {% for erro in form.observacoes.errors %}
+                                    <div class="text-danger mt-1">
+                                        {{ erro }}
+                                    </div>
+                                {% endfor %}
                             </div>
+
                         </div>
 
-                        <div class="form-help-line" id="status-horarios">
-                            Ao escolher a empresa, os horários disponíveis serão carregados automaticamente.
+                        <div
+                            class="form-help-line"
+                            id="status-horarios"
+                        >
+                            Selecione a empresa e a data para visualizar
+                            os horários disponíveis.
                         </div>
 
                         <div class="form-actions mt-4">
-                            <button type="submit" class="btn btn-primary btn-action-primary">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-action-primary"
+                            >
                                 Confirmar agendamento
                             </button>
-                            <a href="{% url 'home' %}" class="btn btn-outline-light btn-action-outline">
+
+                            <a
+                                href="{% url 'home' %}"
+                                class="btn btn-outline-light btn-action-outline"
+                            >
                                 Voltar
                             </a>
+
                         </div>
+
                     </form>
+
                 </div>
             </div>
         </div>
+
     </div>
 </section>
 {% endblock %}
 
+
 {% block scripts %}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const campoTelefone = document.getElementById("id_telefone");
-    const campoEmpresa = document.getElementById("id_empresa");
-    const campoHorario = document.getElementById("id_horario");
-    const campoData = document.getElementById("id_data");
-    const statusHorarios = document.getElementById("status-horarios");
-    const urlHorarios = "{% url 'horarios_por_empresa' %}";
 
-    if (campoData) {
-        flatpickr(campoData, {
-            locale: "pt",
-            dateFormat: "Y-m-d",
-            minDate: "today",
-            allowInput: false
-        });
-    }
+    const campoTelefone =
+        document.getElementById("id_telefone");
 
-    if (campoTelefone) {
-        campoTelefone.addEventListener("input", function (e) {
-            let valor = e.target.value.replace(/\D/g, "");
+    const campoEmpresa =
+        document.getElementById("id_empresa");
 
-            if (valor.length > 11) {
-                valor = valor.slice(0, 11);
-            }
+    const campoHorario =
+        document.getElementById("id_horario");
 
-            if (valor.length > 6) {
-                valor = valor.replace(/(\d{2})(\d{5})(\d+)/, "($1) $2-$3");
-            } else if (valor.length > 2) {
-                valor = valor.replace(/(\d{2})(\d+)/, "($1) $2");
-            }
+    const campoData =
+        document.getElementById("id_data");
 
-            e.target.value = valor;
-        });
-    }
+    const statusHorarios =
+        document.getElementById("status-horarios");
+
+    const urlHorarios =
+        "{% url 'horarios_por_empresa' %}";
+
+
+    // =====================================================
+    // RESET DOS HORÁRIOS
+    // =====================================================
 
     function resetHorarios(mensagem) {
-        campoHorario.innerHTML = '<option value="">Selecione um horário</option>';
-        if (mensagem) {
+
+        if (!campoHorario) {
+            return;
+        }
+
+        campoHorario.innerHTML =
+            '<option value="">Selecione um horário</option>';
+
+        if (statusHorarios && mensagem) {
             statusHorarios.textContent = mensagem;
         }
     }
 
-    if (campoEmpresa && campoHorario) {
-        campoEmpresa.addEventListener("change", function () {
-            const empresaId = this.value;
 
-            if (!empresaId) {
-                resetHorarios("Selecione uma empresa para visualizar os horários.");
-                return;
+    // =====================================================
+    // CARREGAMENTO DOS HORÁRIOS
+    // =====================================================
+
+    function carregarHorarios() {
+
+        if (!campoEmpresa || !campoData || !campoHorario) {
+            return;
+        }
+
+        const empresaId = campoEmpresa.value;
+        const dataSelecionada = campoData.value;
+
+
+        if (!empresaId) {
+
+            resetHorarios(
+                "Selecione uma empresa para visualizar os horários."
+            );
+
+            return;
+        }
+
+
+        if (!dataSelecionada) {
+
+            resetHorarios(
+                "Selecione uma data para visualizar os horários disponíveis."
+            );
+
+            return;
+        }
+
+
+        campoHorario.innerHTML =
+            '<option value="">Carregando horários...</option>';
+
+        if (statusHorarios) {
+            statusHorarios.textContent =
+                "Buscando horários disponíveis...";
+        }
+
+
+        fetch(
+            `${urlHorarios}?empresa=${empresaId}&data=${dataSelecionada}`
+        )
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(
+                    "Resposta inválida do servidor"
+                );
             }
 
-            campoHorario.innerHTML = '<option value="">Carregando horários...</option>';
-            statusHorarios.textContent = "Buscando horários disponíveis...";
+            return response.json();
+        })
+        .then(data => {
 
-            fetch(`${urlHorarios}?empresa=${empresaId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Resposta inválida do servidor");
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    campoHorario.innerHTML = '<option value="">Selecione um horário</option>';
+            campoHorario.innerHTML =
+                '<option value="">Selecione um horário</option>';
 
-                    if (data.horarios && data.horarios.length > 0) {
-                        data.horarios.forEach(item => {
-                            const option = document.createElement("option");
-                            option.value = item.id;
-                            option.textContent = item.horario;
-                            campoHorario.appendChild(option);
-                        });
-                        statusHorarios.textContent = "Horários carregados com sucesso.";
-                    } else {
-                        campoHorario.innerHTML = '<option value="">Nenhum horário disponível</option>';
-                        statusHorarios.textContent = "Não há horários disponíveis para esta empresa.";
-                    }
-                })
-                .catch(error => {
-                    console.error("Erro ao carregar horários:", error);
-                    campoHorario.innerHTML = '<option value="">Erro ao carregar horários</option>';
-                    statusHorarios.textContent = "Erro ao buscar horários. Verifique a rota e a view.";
+
+            if (
+                data.horarios &&
+                data.horarios.length > 0
+            ) {
+
+                data.horarios.forEach(item => {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value = item.id;
+                    option.textContent = item.horario;
+
+                    campoHorario.appendChild(option);
                 });
+
+
+                if (statusHorarios) {
+                    statusHorarios.textContent =
+                        "Horários disponíveis carregados.";
+                }
+
+            } else {
+
+                campoHorario.innerHTML =
+                    '<option value="">Nenhum horário disponível</option>';
+
+
+                if (statusHorarios) {
+                    statusHorarios.textContent =
+                        "Todos os horários desta data estão lotados.";
+                }
+            }
+        })
+        .catch(error => {
+
+            console.error(
+                "Erro ao carregar horários:",
+                error
+            );
+
+
+            campoHorario.innerHTML =
+                '<option value="">Erro ao carregar horários</option>';
+
+
+            if (statusHorarios) {
+                statusHorarios.textContent =
+                    "Não foi possível carregar os horários.";
+            }
         });
     }
+
+
+    // =====================================================
+    // CALENDÁRIO
+    // =====================================================
+
+    if (campoData) {
+
+        flatpickr(campoData, {
+
+            locale: "pt",
+
+            dateFormat: "Y-m-d",
+
+            minDate: "today",
+
+            allowInput: false,
+
+            onChange: function () {
+                carregarHorarios();
+            }
+        });
+    }
+
+
+    // =====================================================
+    // TELEFONE
+    // =====================================================
+
+    if (campoTelefone) {
+
+        campoTelefone.addEventListener(
+            "input",
+            function (e) {
+
+                let valor =
+                    e.target.value.replace(/\D/g, "");
+
+
+                if (valor.length > 11) {
+                    valor = valor.slice(0, 11);
+                }
+
+
+                if (valor.length > 6) {
+
+                    valor = valor.replace(
+                        /(\d{2})(\d{5})(\d+)/,
+                        "($1) $2-$3"
+                    );
+
+                } else if (valor.length > 2) {
+
+                    valor = valor.replace(
+                        /(\d{2})(\d+)/,
+                        "($1) $2"
+                    );
+                }
+
+
+                e.target.value = valor;
+            }
+        );
+    }
+
+
+    // =====================================================
+    // EVENTOS
+    // =====================================================
+
+    if (campoEmpresa) {
+
+        campoEmpresa.addEventListener(
+            "change",
+            carregarHorarios
+        );
+    }
+
+
+    // =====================================================
+    // RECARREGA CASO O FORMULÁRIO VOLTE COM ERRO
+    // =====================================================
+
+    if (
+        campoEmpresa &&
+        campoEmpresa.value &&
+        campoData &&
+        campoData.value
+    ) {
+
+        carregarHorarios();
+    }
+
 });
 </script>
 {% endblock %}
