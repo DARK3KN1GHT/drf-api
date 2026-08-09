@@ -4,8 +4,13 @@ services:
     env: python
     buildCommand: "./build.sh"
     startCommand: "gunicorn config.wsgi:application"
+
     envVars:
       - key: DEBUG
-        value: False
+        value: "False"
+
       - key: ALLOWED_HOSTS
-        value: drf-api.onrender.com
+        value: "drf-api.onrender.com"
+
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://drf-api.onrender.com"

@@ -3,135 +3,254 @@
 {% block title %}Início | Agenda{% endblock %}
 
 {% block content %}
+
 <section class="hero-pro">
     <div class="hero-pro-bg"></div>
 
     <div class="hero-pro-content">
-        <div class="hero-pro-badge">Sistema profissional de agendamentos</div>
+
+        <div class="hero-pro-badge">
+            Sistema online de agendamentos
+        </div>
 
         <h1 class="hero-pro-title">
-            Organize atendimentos com visual moderno, fluxo simples e experiência profissional
+            Agendamentos simples, rápidos e organizados
         </h1>
 
         <p class="hero-pro-text">
-            Um sistema elegante para selecionar empresa, definir data, exibir horários disponíveis
-            e confirmar agendamentos com rapidez, clareza e organização.
+            Escolha a empresa, selecione a data, consulte os horários disponíveis
+            e confirme seu atendimento em poucos passos.
         </p>
 
         <div class="hero-pro-actions">
-            <a href="{% url 'agendar' %}" class="btn btn-lg btn-primary btn-main-action">
+
+            <a
+                href="{% url 'agendar' %}"
+                class="btn btn-lg btn-primary btn-main-action"
+            >
                 Agendar agora
             </a>
-            <a href="/admin/" class="btn btn-lg btn-outline-light btn-secondary-action">
-                Painel Admin
-            </a>
+
         </div>
+
 
         <div class="hero-pro-metrics">
+
             <div class="metric-card">
-                <span class="metric-number">100%</span>
-                <span class="metric-label">Fluxo digital</span>
+                <span class="metric-number">Online</span>
+                <span class="metric-label">Agendamento digital</span>
             </div>
+
             <div class="metric-card">
-                <span class="metric-number">Rápido</span>
-                <span class="metric-label">Preenchimento simples</span>
+                <span class="metric-number">Simples</span>
+                <span class="metric-label">Poucos passos</span>
             </div>
+
             <div class="metric-card">
-                <span class="metric-number">Visual</span>
-                <span class="metric-label">Mais profissional</span>
+                <span class="metric-number">Atualizado</span>
+                <span class="metric-label">Horários disponíveis</span>
             </div>
+
         </div>
     </div>
 </section>
+
 
 <section class="features-pro-section">
+
     <div class="section-header-pro">
-        <span class="section-mini-badge">Recursos principais</span>
-        <h2>Uma estrutura clara para quem agenda e para quem administra</h2>
+
+        <span class="section-mini-badge">
+            Como funciona
+        </span>
+
+        <h2>
+            Tudo o que você precisa para realizar seu agendamento
+        </h2>
+
         <p>
-            Interface preparada para dar mais credibilidade ao sistema e melhorar
-            a experiência de navegação desde a primeira tela.
+            Escolha a unidade desejada, selecione uma data
+            e consulte automaticamente os horários disponíveis.
         </p>
+
     </div>
+
 
     <div class="features-pro-grid">
-        <article class="feature-pro-card">
-            <div class="feature-icon-wrap">🏢</div>
-            <h3>Empresas organizadas</h3>
-            <p>
-                Selecione a empresa e trabalhe com horários separados por unidade,
-                evitando confusão e facilitando o atendimento.
-            </p>
-        </article>
 
         <article class="feature-pro-card">
-            <div class="feature-icon-wrap">📅</div>
-            <h3>Calendário inteligente</h3>
+
+            <div class="feature-icon-wrap">
+                🏢
+            </div>
+
+            <h3>
+                Escolha a empresa
+            </h3>
+
             <p>
-                Escolha datas válidas com uma experiência mais limpa, moderna e adequada
-                para um sistema real de agendamento.
+                Selecione a unidade onde deseja realizar o atendimento.
             </p>
+
         </article>
 
+
         <article class="feature-pro-card">
-            <div class="feature-icon-wrap">⏰</div>
-            <h3>Horários dinâmicos</h3>
+
+            <div class="feature-icon-wrap">
+                📅
+            </div>
+
+            <h3>
+                Escolha a data
+            </h3>
+
             <p>
-                Os horários são carregados automaticamente de acordo com a empresa selecionada,
-                deixando o processo mais rápido e intuitivo.
+                Selecione o melhor dia para realizar seu atendimento.
             </p>
+
         </article>
+
+
+        <article class="feature-pro-card">
+
+            <div class="feature-icon-wrap">
+                ⏰
+            </div>
+
+            <h3>
+                Consulte os horários
+            </h3>
+
+            <p>
+                Veja somente os horários que ainda possuem vagas
+                para a empresa e a data escolhidas.
+            </p>
+
+        </article>
+
     </div>
 </section>
+
 
 <section class="showcase-section">
+
     <div class="showcase-grid">
+
         <div class="showcase-left">
-            <span class="section-mini-badge">Mais credibilidade</span>
-            <h2>Uma primeira impressão melhor para o cliente</h2>
+
+            <span class="section-mini-badge">
+                Processo simples
+            </span>
+
+            <h2>
+                Faça seu agendamento sem complicação
+            </h2>
+
             <p>
-                Um layout bem construído passa mais confiança, valoriza o sistema e ajuda
-                a transformar uma aplicação simples em uma solução com aparência profissional.
+                O sistema organiza as opções de atendimento para que você
+                encontre rapidamente uma data e um horário disponíveis.
             </p>
+
 
             <ul class="showcase-list">
-                <li>Interface escura moderna</li>
-                <li>Blocos bem distribuídos</li>
-                <li>Melhor leitura visual</li>
-                <li>Botões com mais destaque</li>
+
+                <li>
+                    Escolha da empresa
+                </li>
+
+                <li>
+                    Seleção da data
+                </li>
+
+                <li>
+                    Horários disponíveis automaticamente
+                </li>
+
+                <li>
+                    Confirmação do atendimento
+                </li>
+
             </ul>
+
         </div>
+
 
         <div class="showcase-right">
+
             <div class="preview-card preview-card-top">
-                <span class="preview-label">Agendamento</span>
-                <strong>Formulário claro e direto</strong>
-                <p>Dados organizados com foco em rapidez no preenchimento.</p>
+
+                <span class="preview-label">
+                    Etapa 1
+                </span>
+
+                <strong>
+                    Informe seus dados
+                </strong>
+
+                <p>
+                    Preencha as informações necessárias para o atendimento.
+                </p>
+
             </div>
+
 
             <div class="preview-card preview-card-bottom">
-                <span class="preview-label">Administração</span>
-                <strong>Gestão mais prática</strong>
-                <p>Painel separado para controle interno dos registros e horários.</p>
+
+                <span class="preview-label">
+                    Etapa 2
+                </span>
+
+                <strong>
+                    Escolha data e horário
+                </strong>
+
+                <p>
+                    Consulte as opções disponíveis e selecione
+                    o melhor horário para você.
+                </p>
+
             </div>
+
         </div>
+
     </div>
 </section>
+
 
 <section class="cta-bottom-section">
+
     <div class="cta-bottom-box">
+
         <div>
-            <span class="section-mini-badge">Pronto para usar</span>
-            <h2 class="mt-3">Comece agora a testar o fluxo completo do sistema</h2>
+
+            <span class="section-mini-badge">
+                Agendamento
+            </span>
+
+            <h2 class="mt-3">
+                Escolha seu horário e confirme seu atendimento
+            </h2>
+
             <p class="mb-0">
-                Faça um agendamento de teste e depois confira o resultado também no painel administrativo.
+                Consulte agora as datas e horários disponíveis.
             </p>
+
         </div>
 
+
         <div class="cta-bottom-actions">
-            <a href="{% url 'agendar' %}" class="btn btn-primary btn-main-action">Abrir agendamento</a>
-            <a href="/admin/" class="btn btn-outline-light btn-secondary-action">Abrir admin</a>
+
+            <a
+                href="{% url 'agendar' %}"
+                class="btn btn-primary btn-main-action"
+            >
+                Fazer agendamento
+            </a>
+
         </div>
+
     </div>
 </section>
+
 {% endblock %}
