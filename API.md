@@ -29,3 +29,7 @@ PUT /agendamentos/<id>/
 ### Excluir
 
 DELETE /agendamentos/<id>/
+
+## CI/CD
+
+Projeto configurado com integração contínua no GitHub Actions e deploy automático no Render.
