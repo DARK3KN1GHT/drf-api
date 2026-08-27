@@ -27,17 +27,33 @@ class AgendamentoSerializer(serializers.ModelSerializer):
         read_only_fields = ["criado_em", "horario_display"]
 
     def validate(self, data):
-        empresa = data.get("empresa")
-        data_agendamento = data.get("data")
-        horario = data.get("horario")
+        empresa = data.get(
+            "empresa",
+            getattr(self.instance, "empresa", None)
+        )
 
-        if Agendamento.objects.filter(
+        data_agendamento = data.get(
+            "data",
+            getattr(self.instance, "data", None)
+        )
+
+        horario = data.get(
+            "horario",
+            getattr(self.instance, "horario", None)
+        )
+
+        qs = Agendamento.objects.filter(
             empresa=empresa,
             data=data_agendamento,
-            horario=horario
-        ).exists():
+            horario=horario,
+        )
+
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.count() >= 2:
             raise serializers.ValidationError(
-                "Este horário já está ocupado para essa empresa."
+                "Esse horário já atingiu o limite de 2 agendamentos."
             )
 
         return data

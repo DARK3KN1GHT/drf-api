@@ -160,9 +160,10 @@ class AgendamentoRegraNegocioTests(APITestCase):
             horario="15:00"
         )
 
-    def test_nao_permite_agendamento_duplicado(self):
+    def test_nao_permite_mais_de_dois_agendamentos_no_mesmo_horario(self):
         url = "/api/agendamentos/"
-        payload = {
+
+        payload1 = {
             "empresa": self.empresa.id,
             "nome": "Cliente 1",
             "telefone": "(62) 91111-1111",
@@ -171,11 +172,32 @@ class AgendamentoRegraNegocioTests(APITestCase):
             "observacoes": ""
         }
 
-        response1 = self.client.post(url, payload, format="json")
+        payload2 = {
+            "empresa": self.empresa.id,
+            "nome": "Cliente 2",
+            "telefone": "(62) 92222-2222",
+            "data": "2026-04-15",
+            "horario": self.horario.id,
+            "observacoes": ""
+        }
+
+        payload3 = {
+            "empresa": self.empresa.id,
+            "nome": "Cliente 3",
+            "telefone": "(62) 93333-3333",
+            "data": "2026-04-15",
+            "horario": self.horario.id,
+            "observacoes": ""
+        }
+
+        response1 = self.client.post(url, payload1, format="json")
         self.assertEqual(response1.status_code, status.HTTP_201_CREATED)
 
-        response2 = self.client.post(url, payload, format="json")
-        self.assertEqual(response2.status_code, status.HTTP_400_BAD_REQUEST)
+        response2 = self.client.post(url, payload2, format="json")
+        self.assertEqual(response2.status_code, status.HTTP_201_CREATED)
+
+        response3 = self.client.post(url, payload3, format="json")
+        self.assertEqual(response3.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class AgendamentoSegurancaTests(APITestCase):
