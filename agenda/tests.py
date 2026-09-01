@@ -1,12 +1,15 @@
 from datetime import date
+from unittest.mock import Mock, patch
 
 from django.contrib.auth.models import User
+from django.core.cache import cache
+
 from rest_framework import status
 from rest_framework.test import APITestCase
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Empresa, Horario, Agendamento
-from unittest.mock import patch, Mock
+from .models import Agendamento, Empresa, Horario
 
 
 class EmpresaHorarioModelTests(APITestCase):
@@ -108,6 +111,40 @@ class AgendamentoActionAPITests(APITestCase):
             "13:00"
         )
 
+class ThrottleAPITests(APITestCase):
+
+    def setUp(self):
+        cache.clear()
+
+    @patch.object(
+        AnonRateThrottle,
+        "get_rate",
+        return_value="2/minute"
+    )
+    def test_bloqueia_excesso_de_requisicoes_anonimas(
+        self,
+        mock_get_rate
+    ):
+        url = "/api/horarios/"
+
+        response1 = self.client.get(url)
+        response2 = self.client.get(url)
+        response3 = self.client.get(url)
+
+        self.assertEqual(
+            response1.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertEqual(
+            response2.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertEqual(
+            response3.status_code,
+            status.HTTP_429_TOO_MANY_REQUESTS
+        )
 
 class AgendamentoCreateAPITests(APITestCase):
     def setUp(self):
