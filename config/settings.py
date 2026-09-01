@@ -123,6 +123,11 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "DRF API - Agenda",
-    "DESCRIPTION": "Documentação da API de agendamentos desenvolvida com Django REST Framework.",
+    "DESCRIPTION": (
+        "API REST para gerenciamento de empresas, horários e agendamentos. "
+        "Possui autenticação JWT, filtros, busca, ordenação, paginação "
+        "e controle de permissões."
+    ),
     "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }

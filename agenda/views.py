@@ -7,6 +7,7 @@ from django.utils import timezone
 from rest_framework import filters, generics, viewsets
 from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from .forms import AgendamentoForm
 from .models import Horario, Agendamento
@@ -100,12 +101,63 @@ def horarios_por_empresa(request):
 # 🔹 API DRF
 # =========================================================
 
+@extend_schema(
+    summary="Listar horários",
+    description=(
+        "Retorna os horários cadastrados. "
+        "Este endpoint é público."
+    ),
+)
+
 # Horários são públicos
 class HorarioListAPIView(generics.ListAPIView):
     queryset = Horario.objects.all().order_by("horario")
     serializer_class = HorarioSerializer
     permission_classes = [AllowAny]
 
+
+@extend_schema_view(
+    list=extend_schema(
+        summary="Listar agendamentos",
+        description=(
+            "Retorna a lista de agendamentos. "
+            "Permite filtros por empresa, data e nome, "
+            "busca textual e ordenação."
+        ),
+    ),
+    retrieve=extend_schema(
+        summary="Consultar agendamento",
+        description="Retorna os dados de um agendamento específico.",
+    ),
+    create=extend_schema(
+        summary="Criar agendamento",
+        description=(
+            "Cria um novo agendamento. "
+            "É necessário estar autenticado."
+        ),
+    ),
+    update=extend_schema(
+        summary="Atualizar agendamento",
+        description=(
+            "Atualiza completamente um agendamento utilizando PUT. "
+            "É necessário estar autenticado."
+        ),
+    ),
+    partial_update=extend_schema(
+        summary="Atualizar parcialmente um agendamento",
+        description=(
+            "Atualiza apenas os campos enviados utilizando PATCH. "
+            "É necessário estar autenticado."
+        ),
+    ),
+    destroy=extend_schema(
+        summary="Excluir agendamento",
+        description=(
+            "Exclui um agendamento. "
+            "A operação é permitida somente para usuários staff/admin."
+        ),
+    ),
+)
 
 # Agendamentos
 class AgendamentoViewSet(viewsets.ModelViewSet):
