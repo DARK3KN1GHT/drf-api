@@ -4,12 +4,16 @@ from unittest.mock import Mock, patch
 from django.contrib.auth.models import User
 from django.core.cache import cache
 
+from django.core.cache import cache
+
 from rest_framework import status
 from rest_framework.test import APITestCase
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Agendamento, Empresa, Horario
+from .views import HorarioListAPIView
 
 
 class EmpresaHorarioModelTests(APITestCase):
@@ -111,20 +115,22 @@ class AgendamentoActionAPITests(APITestCase):
             "13:00"
         )
 
+class TestAnonRateThrottle(AnonRateThrottle):
+    rate = "2/minute"
 class ThrottleAPITests(APITestCase):
 
     def setUp(self):
         cache.clear()
 
+    def tearDown(self):
+        cache.clear()
+
     @patch.object(
-        AnonRateThrottle,
-        "get_rate",
-        return_value="2/minute"
+        HorarioListAPIView,
+        "throttle_classes",
+        [TestAnonRateThrottle]
     )
-    def test_bloqueia_excesso_de_requisicoes_anonimas(
-        self,
-        mock_get_rate
-    ):
+    def test_bloqueia_excesso_de_requisicoes_anonimas(self):
         url = "/api/horarios/"
 
         response1 = self.client.get(url)
@@ -692,6 +698,9 @@ class JWTAPITests(APITestCase):
 
 class CEPAPITests(APITestCase):
 
+    def setUp(self):
+        cache.clear()
+
     @patch("agenda.services.requests.get")
     def test_consulta_cep_com_sucesso(self, mock_get):
         resposta_mock = Mock()
@@ -765,3 +774,67 @@ class CEPAPITests(APITestCase):
             response.json()["erro"],
             "A consulta de CEP demorou mais que o esperado."
         )
+
+
+class CEPCacheTests(APITestCase):
+
+    def setUp(self):
+        cache.clear()
+
+    @patch("agenda.services.requests.get")
+    def test_primeira_consulta_busca_api_externa(self, mock_get):
+        resposta_mock = Mock()
+
+        resposta_mock.raise_for_status.return_value = None
+        resposta_mock.json.return_value = {
+            "cep": "01001-000",
+            "logradouro": "Praça da Sé",
+            "bairro": "Sé",
+            "localidade": "São Paulo",
+            "uf": "SP",
+        }
+
+        mock_get.return_value = resposta_mock
+
+        response = self.client.get(
+            "/api/cep/01001000/"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        mock_get.assert_called_once()
+
+    @patch("agenda.services.requests.get")
+    def test_segunda_consulta_usa_cache(self, mock_get):
+        resposta_mock = Mock()
+
+        resposta_mock.raise_for_status.return_value = None
+        resposta_mock.json.return_value = {
+            "cep": "01001-000",
+            "logradouro": "Praça da Sé",
+            "bairro": "Sé",
+            "localidade": "São Paulo",
+            "uf": "SP",
+        }
+
+        mock_get.return_value = resposta_mock
+
+        url = "/api/cep/01001000/"
+
+        response1 = self.client.get(url)
+        response2 = self.client.get(url)
+
+        self.assertEqual(
+            response1.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertEqual(
+            response2.status_code,
+            status.HTTP_200_OK
+        )
+
+        mock_get.assert_called_once()

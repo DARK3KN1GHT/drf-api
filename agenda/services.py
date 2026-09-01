@@ -1,11 +1,20 @@
 import requests
 
+from django.core.cache import cache
+
 
 class ServicoCEPError(Exception):
     pass
 
 
 def consultar_cep(cep):
+    chave_cache = f"cep:{cep}"
+
+    dados_cache = cache.get(chave_cache)
+
+    if dados_cache:
+        return dados_cache
+
     url = f"https://viacep.com.br/ws/{cep}/json/"
 
     try:
@@ -32,5 +41,11 @@ def consultar_cep(cep):
         raise ServicoCEPError(
             "CEP não encontrado."
         )
+
+    cache.set(
+        chave_cache,
+        dados,
+        timeout=3600
+    )
 
     return dados
