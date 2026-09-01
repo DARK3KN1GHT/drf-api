@@ -4,7 +4,9 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
 
-from rest_framework import filters, generics, viewsets
+from rest_framework import filters, generics, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
@@ -161,7 +163,11 @@ class HorarioListAPIView(generics.ListAPIView):
 
 # Agendamentos
 class AgendamentoViewSet(viewsets.ModelViewSet):
-    queryset = Agendamento.objects.all().order_by("-criado_em")
+    queryset = (
+    Agendamento.objects
+    .select_related("empresa", "horario")
+    .order_by("-criado_em")
+    )
     serializer_class = AgendamentoSerializer
 
     # Permissões:
@@ -204,3 +210,27 @@ class AgendamentoViewSet(viewsets.ModelViewSet):
     ordering = [
         "-criado_em"
     ]
+    @extend_schema(
+            summary="Resumo do agendamento",
+            description=(
+                "Retorna um resumo simplificado de um agendamento específico."
+            ),
+        )
+    @action(
+            detail=True,
+            methods=["get"],
+            url_path="resumo",
+        )
+    def resumo(self, request, pk=None):
+            agendamento = self.get_object()
+
+            return Response(
+                {
+                    "id": agendamento.id,
+                    "nome": agendamento.nome,
+                    "empresa": agendamento.empresa.nome,
+                    "data": agendamento.data,
+                    "horario": agendamento.horario.horario,
+                },
+                status=status.HTTP_200_OK,
+            )
