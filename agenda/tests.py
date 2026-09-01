@@ -51,52 +51,61 @@ class HorarioAPITests(APITestCase):
             self.assertEqual(len(response.data), 2)
 
 
-class AgendamentoAPITests(APITestCase):
+class AgendamentoActionAPITests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            username="teste_lista",
-            password="123456"
-        )
-
-        refresh = RefreshToken.for_user(self.user)
-        self.client.credentials(
-            HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}"
-        )
-
         self.empresa = Empresa.objects.create(
-            nome="Empresa A",
-            telefone="(62) 99999-9999"
+            nome="Empresa Action",
+            telefone="(62) 90000-1234"
         )
 
         self.horario = Horario.objects.create(
             empresa=self.empresa,
-            horario="10:00"
+            horario="13:00"
         )
 
-        Agendamento.objects.create(
+        self.agendamento = Agendamento.objects.create(
             empresa=self.empresa,
-            nome="Carlos",
-            telefone="(62) 98888-7777",
-            data=date(2026, 3, 31),
             horario=self.horario,
-            observacoes="Teste automático"
+            data=date(2026, 9, 25),
+            nome="Cliente Action",
+            telefone="(62) 95555-5555",
+            observacoes=""
         )
 
-    def test_lista_agendamentos(self):
-        
-        url = "/api/agendamentos/"
+    def test_resumo_agendamento_retorna_200(self):
+        url = f"/api/agendamentos/{self.agendamento.id}/resumo/"
+
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
 
-        if "count" in response.data:
-            self.assertEqual(response.data["count"], 1)
-            self.assertEqual(response.data["results"][0]["nome"], "Carlos")
-            self.assertEqual(response.data["results"][0]["horario_display"], "10:00")
-        else:
-            self.assertEqual(len(response.data), 1)
-            self.assertEqual(response.data[0]["nome"], "Carlos")
-            self.assertEqual(response.data[0]["horario_display"], "10:00")
+    def test_resumo_retorna_nome_e_empresa(self):
+        url = f"/api/agendamentos/{self.agendamento.id}/resumo/"
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.data["nome"],
+            "Cliente Action"
+        )
+
+        self.assertEqual(
+            response.data["empresa"],
+            "Empresa Action"
+        )
+
+    def test_resumo_retorna_horario(self):
+        url = f"/api/agendamentos/{self.agendamento.id}/resumo/"
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.data["horario"],
+            "13:00"
+        )
 
 
 class AgendamentoCreateAPITests(APITestCase):
