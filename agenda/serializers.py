@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
+
 from .models import Horario, Agendamento
 
 
@@ -57,7 +59,7 @@ class AgendamentoSerializer(serializers.ModelSerializer):
             )
 
         return data
-
+    @extend_schema_field(serializers.CharField())
     def get_horario_display(self, obj):
         if obj.horario and obj.horario.horario:
             return str(obj.horario.horario)[:5]
