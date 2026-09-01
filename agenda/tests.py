@@ -213,11 +213,15 @@ class AgendamentoSegurancaTests(APITestCase):
             horario="16:00"
         )
 
-    def test_nao_permite_acesso_sem_token(self):
+    def test_permite_leitura_sem_token(self):
         url = "/api/agendamentos/"
+
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
 
     def test_nao_permite_criar_sem_token(self):
         url = "/api/agendamentos/"
@@ -340,7 +344,35 @@ class AgendamentoUpdateAPITests(APITestCase):
             "Atualizado via PUT"
         )
 
-    def test_exclui_agendamento_com_delete(self):
+    def test_usuario_comum_nao_pode_excluir_agendamento(self):
+        url = f"/api/agendamentos/{self.agendamento.id}/"
+
+        response = self.client.delete(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN
+        )
+
+        self.assertTrue(
+            Agendamento.objects.filter(
+                id=self.agendamento.id
+            ).exists()
+        )
+
+    def test_admin_pode_excluir_agendamento(self):
+        admin = User.objects.create_user(
+            username="admin_delete",
+            password="123456",
+            is_staff=True
+        )
+
+        refresh = RefreshToken.for_user(admin)
+
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}"
+        )
+
         url = f"/api/agendamentos/{self.agendamento.id}/"
 
         response = self.client.delete(url)
@@ -523,4 +555,90 @@ class AgendamentoFiltroAPITests(APITestCase):
         self.assertEqual(
             response.data["results"][0]["nome"],
             "Cliente Empresa 1"
+        )
+
+class JWTAPITests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="teste_jwt",
+            password="123456"
+        )
+
+        self.empresa = Empresa.objects.create(
+            nome="Empresa JWT",
+            telefone="(62) 99999-0000"
+        )
+
+        self.horario = Horario.objects.create(
+            empresa=self.empresa,
+            horario="11:00"
+        )
+
+        Agendamento.objects.create(
+            empresa=self.empresa,
+            horario=self.horario,
+            data=date(2026, 9, 20),
+            nome="Cliente JWT",
+            telefone="(62) 98888-0000",
+            observacoes=""
+        )
+
+    def test_obtem_token_jwt(self):
+        url = "/api/token/"
+
+        payload = {
+            "username": "teste_jwt",
+            "password": "123456"
+        }
+
+        response = self.client.post(
+            url,
+            payload,
+            format="json"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertIn("access", response.data)
+        self.assertIn("refresh", response.data)
+
+    def test_renova_access_token(self):
+        refresh = RefreshToken.for_user(self.user)
+
+        url = "/api/token/refresh/"
+
+        payload = {
+            "refresh": str(refresh)
+        }
+
+        response = self.client.post(
+            url,
+            payload,
+            format="json"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertIn("access", response.data)
+
+    def test_acessa_agendamentos_com_token(self):
+        refresh = RefreshToken.for_user(self.user)
+
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}"
+        )
+
+        url = "/api/agendamentos/"
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
         )
