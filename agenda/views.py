@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
 
-from rest_framework import generics, viewsets
+from rest_framework import filters, generics, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -81,7 +81,11 @@ class AgendamentoViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     # 🔎 Filtros
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [
+    DjangoFilterBackend,
+    filters.SearchFilter,
+    filters.OrderingFilter,
+]
     filterset_fields = ["empresa", "data", "nome"]
 
     # 🔍 Busca
