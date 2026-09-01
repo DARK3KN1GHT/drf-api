@@ -68,4 +68,9 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="api_schema"),
         name="api_redoc",
     ),
+    path(
+        "api/cep/<str:cep>/",
+        views.consultar_cep_api,
+        name="consultar_cep_api",
+    ),
 ]

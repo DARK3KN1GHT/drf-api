@@ -15,6 +15,7 @@ from .forms import AgendamentoForm
 from .models import Horario, Agendamento
 from .serializers import HorarioSerializer, AgendamentoSerializer
 from .permissions import IsAdminForDeleteOtherwiseAuthenticatedOrReadOnly
+from .services import consultar_cep, ServicoCEPError
 
 
 # =========================================================
@@ -75,6 +76,24 @@ def agendar(request):
         "agendar.html",
         {"form": form}
     )
+
+def consultar_cep_api(request, cep):
+    try:
+        dados = consultar_cep(cep)
+
+        return JsonResponse({
+            "cep": dados.get("cep"),
+            "logradouro": dados.get("logradouro"),
+            "bairro": dados.get("bairro"),
+            "localidade": dados.get("localidade"),
+            "uf": dados.get("uf"),
+        })
+
+    except ServicoCEPError as exc:
+        return JsonResponse(
+            {"erro": str(exc)},
+            status=400
+        )
 
 
 def horarios_por_empresa(request):

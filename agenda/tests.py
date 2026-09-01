@@ -6,6 +6,7 @@ from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Empresa, Horario, Agendamento
+from unittest.mock import patch, Mock
 
 
 class EmpresaHorarioModelTests(APITestCase):
@@ -650,4 +651,80 @@ class JWTAPITests(APITestCase):
         self.assertEqual(
             response.status_code,
             status.HTTP_200_OK
+        )
+
+class CEPAPITests(APITestCase):
+
+    @patch("agenda.services.requests.get")
+    def test_consulta_cep_com_sucesso(self, mock_get):
+        resposta_mock = Mock()
+
+        resposta_mock.raise_for_status.return_value = None
+        resposta_mock.json.return_value = {
+            "cep": "01001-000",
+            "logradouro": "Praça da Sé",
+            "bairro": "Sé",
+            "localidade": "São Paulo",
+            "uf": "SP",
+        }
+
+        mock_get.return_value = resposta_mock
+
+        response = self.client.get(
+            "/api/cep/01001000/"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertEqual(
+            response.json()["localidade"],
+            "São Paulo"
+        )
+
+    @patch("agenda.services.requests.get")
+    def test_consulta_cep_inexistente(self, mock_get):
+        resposta_mock = Mock()
+
+        resposta_mock.raise_for_status.return_value = None
+        resposta_mock.json.return_value = {
+            "erro": True
+        }
+
+        mock_get.return_value = resposta_mock
+
+        response = self.client.get(
+            "/api/cep/00000000/"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
+
+        self.assertEqual(
+            response.json()["erro"],
+            "CEP não encontrado."
+        )
+
+    @patch("agenda.services.requests.get")
+    def test_consulta_cep_timeout(self, mock_get):
+        import requests
+
+        mock_get.side_effect = requests.Timeout
+
+        response = self.client.get(
+            "/api/cep/01001000/"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
+
+        self.assertEqual(
+            response.json()["erro"],
+            "A consulta de CEP demorou mais que o esperado."
         )
