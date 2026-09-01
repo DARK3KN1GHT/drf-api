@@ -83,6 +83,7 @@ class AgendamentoAPITests(APITestCase):
         )
 
     def test_lista_agendamentos(self):
+        
         url = "/api/agendamentos/"
         response = self.client.get(url)
 
@@ -353,4 +354,173 @@ class AgendamentoUpdateAPITests(APITestCase):
             Agendamento.objects.filter(
                 id=self.agendamento.id
             ).exists()
+        )
+
+class AgendamentoFiltroAPITests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="teste_filtro",
+            password="123456"
+        )
+
+        refresh = RefreshToken.for_user(self.user)
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}"
+        )
+
+        self.empresa1 = Empresa.objects.create(
+            nome="Empresa 1",
+            telefone="(62) 90000-0001"
+        )
+
+        self.empresa2 = Empresa.objects.create(
+            nome="Empresa 2",
+            telefone="(62) 90000-0002"
+        )
+
+        self.horario1 = Horario.objects.create(
+            empresa=self.empresa1,
+            horario="08:00"
+        )
+
+        self.horario2 = Horario.objects.create(
+            empresa=self.empresa2,
+            horario="09:00"
+        )
+
+        Agendamento.objects.create(
+            empresa=self.empresa1,
+            horario=self.horario1,
+            data=date(2026, 9, 15),
+            nome="Cliente Empresa 1",
+            telefone="(62) 91111-1111",
+            observacoes=""
+        )
+
+        Agendamento.objects.create(
+            empresa=self.empresa2,
+            horario=self.horario2,
+            data=date(2026, 9, 15),
+            nome="Cliente Empresa 2",
+            telefone="(62) 92222-2222",
+            observacoes=""
+        )
+
+    def test_ordena_agendamentos_por_nome(self):
+        url = "/api/agendamentos/?ordering=nome"
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        nomes = [
+            item["nome"]
+            for item in response.data["results"]
+        ]
+
+        self.assertEqual(
+            nomes,
+            sorted(nomes)
+        )
+
+    def test_paginacao_agendamentos(self):
+        for i in range(6):
+            Agendamento.objects.create(
+                empresa=self.empresa1,
+                horario=self.horario1,
+                data=date(2026, 9, 20 + i),
+                nome=f"Cliente Extra {i}",
+                telefone=f"(62) 93333-33{i:02d}",
+                observacoes=""
+            )
+
+        url = "/api/agendamentos/"
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertEqual(
+            len(response.data["results"]),
+            5
+        )
+
+        self.assertIsNotNone(
+            response.data["next"]
+        )
+
+    def test_filtra_agendamentos_por_empresa(self):
+            url = f"/api/agendamentos/?empresa={self.empresa1.id}"
+
+            response = self.client.get(url)
+
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_200_OK
+            )
+
+            self.assertEqual(
+                response.data["count"],
+                1
+            )
+
+            self.assertEqual(
+                response.data["results"][0]["nome"],
+                "Cliente Empresa 1"
+            )
+
+    def test_filtra_agendamentos_por_data(self):
+        url = "/api/agendamentos/?data=2026-09-15"
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertEqual(
+            response.data["count"],
+            2
+        )
+
+        nomes = [
+            item["nome"]
+            for item in response.data["results"]
+        ]
+
+        self.assertIn(
+            "Cliente Empresa 1",
+            nomes
+        )
+
+        self.assertIn(
+            "Cliente Empresa 2",
+            nomes
+        )
+
+    def test_busca_agendamentos_por_nome(self):
+        url = "/api/agendamentos/?search=Cliente Empresa 1"
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertEqual(
+            response.data["count"],
+            1
+        )
+
+        self.assertEqual(
+            response.data["results"][0]["nome"],
+            "Cliente Empresa 1"
         )
