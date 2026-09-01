@@ -232,3 +232,125 @@ class AgendamentoSegurancaTests(APITestCase):
         response = self.client.post(url, payload, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+class AgendamentoUpdateAPITests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="teste_update",
+            password="123456"
+        )
+
+        refresh = RefreshToken.for_user(self.user)
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}"
+        )
+
+        self.empresa = Empresa.objects.create(
+            nome="Empresa Update",
+            telefone="(62) 98888-1234"
+        )
+
+        self.horario = Horario.objects.create(
+            empresa=self.empresa,
+            horario="16:00"
+        )
+
+        self.agendamento = Agendamento.objects.create(
+            empresa=self.empresa,
+            horario=self.horario,
+            data=date(2026, 9, 10),
+            nome="Cliente Teste",
+            telefone="(62) 91111-1111",
+            observacoes=""
+        )
+
+    def test_edita_telefone_com_patch(self):
+        url = f"/api/agendamentos/{self.agendamento.id}/"
+
+        payload = {
+            "telefone": "(62) 99999-9999"
+        }
+
+        response = self.client.patch(
+            url,
+            payload,
+            format="json"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.agendamento.refresh_from_db()
+
+        self.assertEqual(
+            self.agendamento.telefone,
+            "(62) 99999-9999"
+        )
+
+        self.assertEqual(
+            self.agendamento.nome,
+            "Cliente Teste"
+        )
+
+    def test_edita_agendamento_com_put(self):
+        url = f"/api/agendamentos/{self.agendamento.id}/"
+
+        payload = {
+            "empresa": self.empresa.id,
+            "nome": "Cliente Atualizado",
+            "telefone": "(62) 98888-8888",
+            "data": "2026-09-11",
+            "horario": self.horario.id,
+            "observacoes": "Atualizado via PUT"
+        }
+
+        response = self.client.put(
+            url,
+            payload,
+            format="json"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.agendamento.refresh_from_db()
+
+        self.assertEqual(
+            self.agendamento.nome,
+            "Cliente Atualizado"
+        )
+
+        self.assertEqual(
+            self.agendamento.telefone,
+            "(62) 98888-8888"
+        )
+
+        self.assertEqual(
+            str(self.agendamento.data),
+            "2026-09-11"
+        )
+
+        self.assertEqual(
+            self.agendamento.observacoes,
+            "Atualizado via PUT"
+        )
+
+    def test_exclui_agendamento_com_delete(self):
+        url = f"/api/agendamentos/{self.agendamento.id}/"
+
+        response = self.client.delete(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_204_NO_CONTENT
+        )
+
+        self.assertFalse(
+            Agendamento.objects.filter(
+                id=self.agendamento.id
+            ).exists()
+        )
